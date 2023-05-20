@@ -1,4 +1,4 @@
-# Medical-and-Lab-Visitor-Management-with-Face-Recognition-Using-Django
+# Medical-and-Lab-Visitor-Management-System-with-Face-Recognition-Using-Django
 The "Medical and Lab Visitor Management with Face Recognition using Django" project is a cutting-edge solution designed to streamline and enhance the visitor management process in medical facilities and laboratories. Leveraging the power of Django, this web application provides a comprehensive suite of features, including user creation, live camera-based user image capture, face recognition-based user verification, and user management.
 
 The project enables administrators to efficiently manage visitor information by allowing them to add, update, and delete user details. Users can be registered with their relevant information and have their picture taken using the integrated live camera functionality. The advanced face recognition algorithm ensures reliable user verification, eliminating the need for traditional identification methods.
