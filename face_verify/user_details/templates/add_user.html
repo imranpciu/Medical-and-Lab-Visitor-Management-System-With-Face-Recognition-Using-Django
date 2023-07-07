@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Add User</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+</head>
+
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+        crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+    {% include "base.html" %}
+    <h1 class="text-center my-3">Medical and Lab User Management System</h1>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h3 class="container text-center">Add User:</h3>
+                         <form action="{% url 'user_details:add_user' %}" method="POST" enctype="multipart/form-data" onsubmit="capture()">
+                              {% csrf_token %}
+                              <div class="form-group mb-3">
+                                <label for="name">Full Name:</label>
+                                <input type="text" class="form-control" id="name" placeholder="Enter name" name="user_name">
+                              </div>
+                              <div class="form-group mb-3">
+                                <label for="email">Email:</label>
+                                <input type="email" class="form-control" id="email" placeholder="xyz@mail.com" name="user_email">
+                              </div>
+                              <div class="form-group mb-3">
+                                <label for="name">Phone Number:</label>
+                                <input type="text" class="form-control" id="phone" placeholder="0181-0000000" name="user_phone_number">
+                              </div>
+                              <div class="form-group mb-3">
+                                <label for="gender">Gender</label>
+                                <select class="form-control" id="gender" name="user_gender">
+                                  <option value="">Select Gender</option>
+                                  <option value="male">Male</option>
+                                  <option value="female">Female</option>
+                                  <option value="other">Other</option>
+                                </select>
+                              </div>
+                              <div class="form-group mb-3">
+                                <label for="address">Address</label>
+                                <textarea class="form-control" id="address" rows="3" name="user_address"></textarea>
+                              </div>
+
+                              <h1>Take Selfie & Finish</h1><hr>
+                              <div class="camera2">
+                                <video id="video2">Video stream not available.</video>
+                                <button class="btn btn-primary" id="startbutton2">Take photo</button>
+                              </div>
+                              <small class="form-text text-muted"> Capture image: </small>
+                              <canvas id="canvas2">
+                                <div class="output2">
+                                  <img id="photo2" alt="The screen capture will appear in this box.">
+                                  <input type="hidden" name="image" id="sphoto2">
+                                </div>
+                              </canvas>
+                              <button type="submit" class="btn btn-primary">Submit</button>
+                         </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+
+        (function() {
+          // The width and height of the captured photo. We will set the
+          // width to the value defined here, but the height will be
+          // calculated based on the aspect ratio of the input stream.
+        
+            var width = 510;    // We will scale the photo width to this
+            var height = 800;     // This will be computed based on the input stream
+        
+          // |streaming| indicates whether or not we're currently streaming
+          // video from the camera. Obviously, we start at false.
+        
+            var streaming = false;
+        
+          // The various HTML elements we need to configure or control. These
+          // will be set by the startup() function.
+        
+            var video = null;
+            var canvas = null;
+            var photo = null;
+            var startbutton = null;
+        
+        function showViewLiveResultButton() {
+            if (window.self !== window.top) {
+              // Ensure that if our document is in a frame, we get the user
+              // to first open it in its own tab or window. Otherwise, it
+              // won't be able to request permission for camera access.
+                document.querySelector(".contentarea").remove();
+                const button = document.createElement("button");
+                button.textContent = "View live result of the example code above";
+                document.body.append(button);
+                button.addEventListener('click', () => window.open(location.href));
+                return true;
+            }
+            return false;
+        }
+        
+        function startup() {
+            if (showViewLiveResultButton()) { return; }
+            video = document.getElementById('video2');
+            canvas = document.getElementById('canvas2');
+            photo = document.getElementById('photo2');
+            startbutton = document.getElementById('startbutton2');
+        
+            navigator.mediaDevices.getUserMedia({video: true, audio: false})
+            .then(function(stream) {
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(function(err) {
+                console.log("An error occurred: " + err);
+            });
+        
+            video.addEventListener('canplay', function(ev){
+                if (!streaming) {
+                height = video.videoHeight / (video.videoWidth/width);
+        
+                // Firefox currently has a bug where the height can't be read from
+                // the video, so we will make assumptions if this happens.
+        
+                if (isNaN(height)) {
+                    height = width / (4/3);
+                }
+        
+                video.setAttribute('width', width);
+                video.setAttribute('height', height);
+                canvas.setAttribute('width', width);
+                canvas.setAttribute('height', height);
+                streaming = true;
+                }
+            }, false);
+        
+            startbutton.addEventListener('click', function(ev){
+                takepicture();
+                ev.preventDefault();
+            }, false);
+        
+            clearphoto();
+            }
+        
+          // Fill the photo with an indication that none has been
+          // captured.
+        
+        function clearphoto() {
+            var context = canvas.getContext('2d');
+            context.fillStyle = "#AAA";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+        
+            var data = canvas.toDataURL('image/png');
+            photo2.setAttribute('src', data);
+            }
+        
+          // Capture a photo by fetching the current contents of the video
+          // and drawing it into a canvas, then converting that to a PNG
+          // format data URL. By drawing it on an offscreen canvas and then
+          // drawing that to the screen, we can change its size and/or apply
+          // other changes before drawing it.
+        
+        function takepicture() {
+            var context = canvas.getContext('2d');
+            if (width && height) {
+                canvas.width = width;
+                canvas.height = height;
+                context.drawImage(video, 0, 0, width, height);
+        
+                var data = canvas.toDataURL('image/png');
+                photo2.setAttribute('src', data);
+            //  $(".image-tag").val(data);
+                sphoto2.setAttribute('value', data);
+            } else {
+                clearphoto();
+            }
+        }
+        
+          // Set up our event listener to run the startup process
+          // once loading is complete.
+            window.addEventListener('load', startup, false);
+        })();
+
+        </script>
+    
+    
+</body>
+</html>
+
